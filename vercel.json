@@ -3,6 +3,8 @@
   "routes": [
     { "src": "/share", "dest": "/share.html" },
     { "src": "/sw.js", "dest": "/sw.js" },
-    { "src": "/manifest.json", "dest": "/manifest.json" }
+    { "src": "/manifest.json", "dest": "/manifest.json" },
+    { "src": "/fonts/(.*)", "dest": "/public/fonts/$1" },
+    { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
