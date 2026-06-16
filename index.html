@@ -781,7 +781,20 @@ function bindActions(){
 
 function bindDragEvents(){
   document.querySelectorAll(".card[draggable],.list-row[draggable]").forEach(el=>{
-    el.addEventListener("dragstart",e=>{dragItemId=el.dataset.id;el.classList.add("dragging");e.dataTransfer.effectAllowed="move";e.dataTransfer.setData("text/plain",dragItemId);showDragHint();});
+    el.addEventListener("dragstart",e=>{
+      dragItemId=el.dataset.id;
+      el.classList.add("dragging");
+      e.dataTransfer.effectAllowed="move";
+      e.dataTransfer.setData("text/plain",dragItemId);
+      showDragHint();
+      const item=items.find(i=>i.id===dragItemId);
+      const ghost=document.createElement("div");
+      ghost.style.cssText="position:fixed;top:-100px;left:-100px;background:#1A1714;color:#F0EAE0;font-family:'DM Sans',system-ui,sans-serif;font-size:12px;padding:8px 14px;border-radius:8px;border:1px solid rgba(196,168,130,0.3);white-space:nowrap;max-width:200px;overflow:hidden;text-overflow:ellipsis;box-shadow:0 4px 16px rgba(0,0,0,0.3);";
+      ghost.textContent="✦ " + (item?.title||"Untitled").substring(0,40);
+      document.body.appendChild(ghost);
+      e.dataTransfer.setDragImage(ghost,0,0);
+      setTimeout(()=>ghost.remove(),0);
+    });
     el.addEventListener("dragend",()=>{el.classList.remove("dragging");dragItemId=null;hideDragHint();document.querySelectorAll(".proj-item.drag-over").forEach(p=>p.classList.remove("drag-over"));});
   });
 }
