@@ -115,7 +115,7 @@ async function claudeText(apiKey, prompt, maxTokens = 400) {
       "anthropic-version": "2023-06-01",
     },
     body: JSON.stringify({
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-5",
       max_tokens: maxTokens,
       messages: [{ role: "user", content: prompt }],
     }),
@@ -135,7 +135,7 @@ async function claudeVision(apiKey, prompt, imageUrl) {
       "anthropic-version": "2023-06-01",
     },
     body: JSON.stringify({
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-5",
       max_tokens: 400,
       messages: [
         {
