@@ -26,11 +26,7 @@ async function init() {
   const state = await new Promise((res) => chrome.runtime.sendMessage({ action: "getState" }, res));
   projects = state.projects || [];
 
-  const apiKey = await new Promise((res) => chrome.storage.local.get(["apiKey"], (r) => res(r.apiKey)));
-  if (!apiKey) {
-    document.getElementById("apiKeyNotice").style.display = "block";
-    document.getElementById("projectHint").textContent = "No API key — will save without AI sorting";
-  }
+  
 
   renderRecent(state.items || []);
 }

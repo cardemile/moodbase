@@ -241,9 +241,21 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     return true;
   }
   if (request.action === "getState") {
-    chrome.storage.local.get(["items", "projects"]).then((r) => {
-      sendResponse({ items: r.items || [], projects: r.projects || [] });
-    });
+    (async () => {
+      try {
+        const token = await getValidAccessToken();
+        const headers = { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${token || SUPABASE_KEY}` };
+        const [itemsRes, projectsRes] = await Promise.all([
+          fetch(`${SUPABASE_URL}/rest/v1/items?select=id,title,project_id,type,tags,created_at&order=created_at.desc&limit=4`, { headers }),
+          fetch(`${SUPABASE_URL}/rest/v1/projects?select=id,name,color`, { headers })
+        ]);
+        const items = await itemsRes.json();
+        const projects = await projectsRes.json();
+        sendResponse({ items: Array.isArray(items) ? items.map(i => ({ ...i, project: i.project_id })) : [], projects: Array.isArray(projects) ? projects : [] });
+      } catch(e) {
+        sendResponse({ items: [], projects: [] });
+      }
+    })();
     return true;
   }
   if (request.action === "updateProjects") {
