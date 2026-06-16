@@ -168,9 +168,9 @@ body { color: var(--text); font-family: 'Instrument Sans', sans-serif; font-size
 .card-proj-name { font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em;font-weight:500; }
 .card-title { font-family:'Playfair Display',serif;font-size:15px;color:var(--text);line-height:1.4;margin-bottom:8px; }
 .card-summary { font-size:12px;color:var(--text-dim);line-height:1.6;margin-bottom:10px;font-style:italic;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden; }
-.note-preview { position:relative; cursor:default; z-index:1; }
-.note-preview::after { content:attr(data-full); position:absolute; bottom:calc(100% + 8px); left:0; background:#1A1714; color:#F0EAE0; font-family:'DM Sans',system-ui,sans-serif; font-size:12px; line-height:1.6; padding:16px 20px; border-radius:12px; border:1px solid rgba(196,168,130,0.2); width:300px; z-index:99999; opacity:0; pointer-events:none; transition:opacity 0.15s; white-space:pre-wrap; box-shadow:0 8px 32px rgba(0,0,0,0.4); }
-.note-preview:hover::after { opacity:1; }
+.note-preview { cursor:default; }
+.note-tooltip { position:fixed; background:#1A1714; color:#F0EAE0; font-family:'DM Sans',system-ui,sans-serif; font-size:12px; line-height:1.6; padding:16px 20px; border-radius:12px; border:1px solid rgba(196,168,130,0.2); width:300px; z-index:99999; pointer-events:none; white-space:pre-wrap; box-shadow:0 8px 32px rgba(0,0,0,0.4); display:none; }
+
 .card-tags { display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px; }
 .card-tag { font-size:10px;color:var(--text-muted);background:var(--bg);padding:3px 8px;border-radius:20px;border:1px solid var(--border); }
 .card-footer { display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--text-muted);padding-top:10px;border-top:1px solid var(--border); }
@@ -254,6 +254,8 @@ body { color: var(--text); font-family: 'Instrument Sans', sans-serif; font-size
 .toast { position:fixed;bottom:24px;right:24px;background:var(--accent);color:var(--bg);font-size:13px;padding:11px 18px;border-radius:10px;z-index:9999;opacity:0;transform:translateY(8px);transition:opacity 0.2s,transform 0.2s;pointer-events:none;box-shadow:0 4px 20px rgba(0,0,0,0.15); }
 .toast.show { opacity:1;transform:translateY(0); }
 </style>
+<div class="note-tooltip" id="noteTooltip"></div>
+
 </head>
 <body>
 
@@ -882,6 +884,25 @@ document.getElementById("saveProjBtn").addEventListener("click",async()=>{
 });
 
 scheduleBootstrapFallback();
+document.addEventListener("mouseover", e => {
+  const el = e.target.closest(".note-preview");
+  if (!el) return;
+  const tooltip = document.getElementById("noteTooltip");
+  tooltip.textContent = el.dataset.full;
+  tooltip.style.display = "block";
+  tooltip.style.left = Math.min(e.clientX + 12, window.innerWidth - 320) + "px";
+  tooltip.style.top = Math.max(e.clientY - 120, 10) + "px";
+});
+document.addEventListener("mousemove", e => {
+  if (!e.target.closest(".note-preview")) return;
+  const tooltip = document.getElementById("noteTooltip");
+  tooltip.style.left = Math.min(e.clientX + 12, window.innerWidth - 320) + "px";
+  tooltip.style.top = Math.max(e.clientY - 120, 10) + "px";
+});
+document.addEventListener("mouseout", e => {
+  if (!e.target.closest(".note-preview")) return;
+  document.getElementById("noteTooltip").style.display = "none";
+});
 </script>
 </body>
 </html>
