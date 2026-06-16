@@ -168,6 +168,9 @@ body { color: var(--text); font-family: 'Instrument Sans', sans-serif; font-size
 .card-proj-name { font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em;font-weight:500; }
 .card-title { font-family:'Playfair Display',serif;font-size:15px;color:var(--text);line-height:1.4;margin-bottom:8px; }
 .card-summary { font-size:12px;color:var(--text-dim);line-height:1.6;margin-bottom:10px;font-style:italic;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden; }
+.note-preview { position:relative; cursor:default; }
+.note-preview::after { content:attr(data-full); position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:#1A1714; color:#F0EAE0; font-family:'DM Sans',system-ui,sans-serif; font-size:12px; line-height:1.6; padding:12px 16px; border-radius:10px; border:1px solid rgba(196,168,130,0.2); max-width:360px; width:max-content; z-index:99999; opacity:0; pointer-events:none; transition:opacity 0.15s; white-space:pre-wrap; box-shadow:0 4px 20px rgba(0,0,0,0.3); }
+.note-preview:hover::after { opacity:1; }
 .card-tags { display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px; }
 .card-tag { font-size:10px;color:var(--text-muted);background:var(--bg);padding:3px 8px;border-radius:20px;border:1px solid var(--border); }
 .card-footer { display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--text-muted);padding-top:10px;border-top:1px solid var(--border); }
@@ -725,7 +728,7 @@ function renderCard(item){
   if(item.type==="image")visual=`<div class="card-thumb" style="padding:0"><img class="full" src="${item.url}" loading="lazy" onerror="this.parentElement.innerHTML='<div style=padding:20px;display:flex;align-items:center;justify-content:center><span class=type-icon>🖼</span></div>'" /></div>`;
   else if(item.favicon)visual=`<div class="card-thumb"><img class="fav" src="${item.favicon}" onerror="this.style.display='none'" /></div>`;
   else visual=`<div class="card-thumb"><span class="type-icon">${item.type==="note"?"✎":"🔗"}</span></div>`;
-  const noteSnippet=item.type==="note"&&item.content?`<div class="card-summary" title="${item.content.replace(/"/g,'&quot;')}">"${item.content.length>200?item.content.substring(0,200)+'…':item.content}"</div>`:"";
+  const noteSnippet=item.type==="note"&&item.content?`<div class="card-summary note-preview" data-full="${item.content.replace(/"/g,'&quot;')}">"${item.content.length>200?item.content.substring(0,200)+'…':item.content}"</div>`:"";
   const summaryHtml=item.summary&&item.type!=="note"?`<div class="card-summary">${item.summary}</div>`:"";
   return`<div class="card" data-id="${item.id}" data-url="${item.source_url||item.url||""}" draggable="true">
     ${visual}
