@@ -15,7 +15,7 @@ export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
   try {
-    const { messages, query, projectFilter } = req.body || {};
+    const { messages, query, projectFilter, userId } = req.body || {};
 
     const anthropicKey = process.env.ANTHROPIC_API_KEY;
     const openaiKey    = process.env.OPENAI_API_KEY;
@@ -65,6 +65,7 @@ export default async function handler(req, res) {
             match_count: 14,
             // Optional: filter to active project
             ...(projectFilter ? { filter_project_id: projectFilter } : {}),
+            ...(userId ? { filter_user_id: userId } : {}),
           }),
         });
 
@@ -83,6 +84,7 @@ export default async function handler(req, res) {
     if (relevantItems.length === 0) {
       let url = `${supabaseUrl}/rest/v1/items?select=id,title,url,type,summary,tags,project_id,visual_description,created_at&order=created_at.desc&limit=50`;
       if (projectFilter) url += `&project_id=eq.${projectFilter}`;
+      if (userId) url += `&user_id=eq.${userId}`;
 
       const fallbackResp = await fetch(url, {
         headers: {
