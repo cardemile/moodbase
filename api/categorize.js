@@ -38,7 +38,7 @@ ITEM: ${contentDesc}
 PROJECTS:
 ${projectList}
 
-Return: {"project": "<slug or general>", "tags": ["tag1","tag2","tag3"], "summary": "<1-2 sentences>"}`;
+Return: {"title": "<a clear, complete, descriptive title under 12 words — never end mid-sentence or mid-clause; if the given title is incomplete or just a caption fragment, write a better one>", "project": "<slug or general>", "tags": ["tag1","tag2","tag3"], "summary": "<1-2 sentences>"}`;
 
     const categorizeResp = await claudeText(anthropicKey, categorizePrompt, 400);
     const clean = categorizeResp.trim().replace(/```json|```/g, "").trim();
@@ -70,7 +70,7 @@ Be specific and evocative. 3-5 sentences. No bullet points. No preamble.`;
       try {
         // Combine every text signal we have into one rich embedding document
         const embedText = [
-          raw.title || "",
+          categorized.title || raw.title || "",
           categorized.summary || "",
           (categorized.tags || []).join(", "),
           visualDescription || "",
