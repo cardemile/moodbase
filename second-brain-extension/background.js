@@ -284,7 +284,7 @@ async function processAndSave(raw, tabId) {
     await sbInsert("items", {
       type: raw.type || "link",
       url: raw.url || null,
-      title: raw.title || "Untitled",
+      title: aiResult.title || raw.title || "Untitled",
       content: raw.content || null,
       summary,
       tags,
