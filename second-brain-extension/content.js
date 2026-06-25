@@ -27,15 +27,25 @@ function createSaveBtn() {
     if (!currentTarget) return;
     const el = currentTarget;
     let imageUrl = null;
+    let videoUrl = null;
+    let isMotion = false;
     if (el.tagName === "VIDEO") {
+      videoUrl = el.currentSrc || el.src || (el.querySelector("source") ? el.querySelector("source").src : null);
       imageUrl = el.getAttribute("poster") || null;
+      isMotion = !!videoUrl;
     } else if (el.tagName === "IMG") {
       imageUrl = el.src || null;
+      if (imageUrl && /\.gif(\?|$)/i.test(imageUrl)) {
+        videoUrl = imageUrl;
+        isMotion = true;
+      }
     }
-    if (!imageUrl || imageUrl.startsWith("data:")) imageUrl = null;
+    if (imageUrl && imageUrl.startsWith("data:")) imageUrl = null;
+    if (videoUrl && videoUrl.startsWith("blob:")) { videoUrl = null; isMotion = false; }
     const item = {
-      type: imageUrl ? "image" : "link",
-      url: imageUrl || window.location.href,
+      type: isMotion ? "video" : (imageUrl ? "image" : "link"),
+      url: videoUrl || imageUrl || window.location.href,
+      posterUrl: imageUrl || null,
       title: el.alt || el.title || document.title,
       favicon: document.querySelector('link[rel~="icon"]') ? document.querySelector('link[rel~="icon"]').href : "",
       sourceUrl: window.location.href,

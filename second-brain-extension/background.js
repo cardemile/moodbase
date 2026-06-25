@@ -290,6 +290,7 @@ async function processAndSave(raw, tabId) {
       tags,
       favicon: raw.favicon || "",
       source_url: raw.sourceUrl || raw.url || "",
+      poster_url: raw.posterUrl || null,
       project_id: projectId,
       visual_description: aiResult.visual_description || null,
       embedding: aiResult.embedding || null
