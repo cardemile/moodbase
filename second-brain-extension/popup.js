@@ -10,7 +10,20 @@ const PROJECT_COLORS = {
 let currentTab = null;
 let projects = [];
 
+async function initToggle() {
+  const toggle = document.getElementById("extensionToggle");
+  const result = await new Promise((res) => chrome.storage.local.get(["extensionEnabled"], res));
+  const enabled = result.extensionEnabled !== false; // default true
+  toggle.classList.toggle("on", enabled);
+  toggle.onclick = async () => {
+    const newEnabled = !toggle.classList.contains("on");
+    toggle.classList.toggle("on", newEnabled);
+    await chrome.storage.local.set({ extensionEnabled: newEnabled });
+  };
+}
+
 async function init() {
+  initToggle();
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   currentTab = tab;
 

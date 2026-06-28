@@ -15,6 +15,19 @@ chrome.runtime.onMessage.addListener((msg) => {
 let saveBtn = null;
 let currentTarget = null;
 let hideTimer = null;
+let extensionEnabled = true;
+
+// Never show the hover-save button on the Moodbase dashboard itself.
+const isMoodbaseDashboard = window.location.hostname === "moodbase.vercel.app";
+
+if (!isMoodbaseDashboard) {
+  chrome.storage.local.get(["extensionEnabled"], (result) => {
+    extensionEnabled = result.extensionEnabled !== false; // default true
+  });
+  chrome.storage.onChanged.addListener((changes) => {
+    if (changes.extensionEnabled) extensionEnabled = changes.extensionEnabled.newValue !== false;
+  });
+}
 
 function createSaveBtn() {
   const btn = document.createElement("div");
@@ -79,7 +92,7 @@ function hideBtn() {
 
 document.addEventListener("mouseover", (e) => {
   const el = e.target;
-  if (el.tagName === "IMG" || el.tagName === "VIDEO") showBtnOnElement(el);
+  if (!isMoodbaseDashboard && extensionEnabled && (el.tagName === "IMG" || el.tagName === "VIDEO")) showBtnOnElement(el);
 }, true);
 
 document.addEventListener("mouseout", (e) => {
