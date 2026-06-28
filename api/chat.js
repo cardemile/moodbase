@@ -82,8 +82,17 @@ export default async function handler(req, res) {
 
     // ── 3. FALLBACK: recency sort (original behaviour) ────────────────────────
     if (relevantItems.length === 0) {
+      let itemIdsInProject = null;
+      if (projectFilter) {
+        const linkResp = await fetch(
+          `${supabaseUrl}/rest/v1/item_projects?select=item_id&project_id=eq.${projectFilter}`,
+          { headers: { apikey: supabaseKey, Authorization: `Bearer ${supabaseKey}` } }
+        );
+        const linkData = await linkResp.json();
+        itemIdsInProject = Array.isArray(linkData) ? linkData.map((l) => l.item_id) : [];
+      }
       let url = `${supabaseUrl}/rest/v1/items?select=id,title,url,type,summary,tags,project_id,visual_description,created_at&order=created_at.desc&limit=50`;
-      if (projectFilter) url += `&project_id=eq.${projectFilter}`;
+      if (itemIdsInProject) url += `&id=in.(${itemIdsInProject.join(",")})`;
       if (userId) url += `&user_id=eq.${userId}`;
 
       const fallbackResp = await fetch(url, {
