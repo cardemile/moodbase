@@ -30,15 +30,15 @@ function createSaveBtn() {
     let videoUrl = null;
     let isMotion = false;
     if (el.tagName === "VIDEO") {
-      videoUrl = el.currentSrc || el.src || (el.querySelector("source") ? el.querySelector("source").src : null);
+      const sbSources = [...el.querySelectorAll("source[src]")].map(s => s.src);
+      const sbRealSource = sbSources.find(src => !/\.gif(\?|$)/i.test(src));
+      videoUrl = (el.currentSrc && !/\.gif(\?|$)/i.test(el.currentSrc) ? el.currentSrc : null)
+        || sbRealSource
+        || (el.src && !/\.gif(\?|$)/i.test(el.src) ? el.src : null);
       imageUrl = el.getAttribute("poster") || null;
       isMotion = !!videoUrl;
     } else if (el.tagName === "IMG") {
       imageUrl = el.src || null;
-      if (imageUrl && /\.gif(\?|$)/i.test(imageUrl)) {
-        videoUrl = imageUrl;
-        isMotion = true;
-      }
     }
     if (imageUrl && imageUrl.startsWith("data:")) imageUrl = null;
     if (videoUrl && videoUrl.startsWith("blob:")) { videoUrl = null; isMotion = false; }
