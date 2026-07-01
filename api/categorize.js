@@ -31,14 +31,22 @@ export default async function handler(req, res) {
         ? `TEXT: "${raw.content}"`
         : `PAGE: "${raw.title}" URL: ${raw.url}`;
 
-    const categorizePrompt = `Analyze this saved item and return ONLY a JSON object.
+    const categorizePrompt = `You are a creative librarian sorting saved references into projects for a visual moodboard tool called Moodbase.
 
-ITEM: ${contentDesc}
+SAVED ITEM:
+${contentDesc}
 
-PROJECTS:
+AVAILABLE PROJECTS:
 ${projectList}
 
-Return: {"title": "<a clear, complete, descriptive title under 12 words — never end mid-sentence or mid-clause; if the given title is incomplete or just a caption fragment, write a better one>", "project": "<slug or general>", "tags": ["tag1","tag2","tag3"], "summary": "<1-2 sentences>"}`;
+INSTRUCTIONS:
+- Infer what each project is about from its name. Use common sense.
+- "Textures": surfaces/materials/patterns. "Websites": UI/web design. "Album Arts": music artwork. "Tutorials": learning/how-to. "Brand Identity": logos/branding/typography.
+- Pick the single best matching project slug. If nothing fits, use "general".
+- Never leave unassigned just because keywords are missing. Use the project name as primary signal.
+- Return ONLY a JSON object, no markdown, no explanation.
+
+Return: {"title": "<clear descriptive title under 12 words>", "project": "<slug or general>", "tags": ["tag1","tag2","tag3"], "summary": "<1-2 sentences>"}` ;
 
     const categorizeResp = await claudeText(anthropicKey, categorizePrompt, 400);
     const clean = categorizeResp.trim().replace(/```json|```/g, "").trim();

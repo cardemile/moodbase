@@ -281,7 +281,7 @@ async function processAndSave(raw, tabId) {
     tags = aiResult.tags || [];
     summary = aiResult.summary || "";
 
-    await sbInsert("items", {
+    const inserted = await sbInsert("items", {
       type: raw.type || "link",
       url: raw.url || null,
       title: aiResult.title || raw.title || "Untitled",
@@ -295,6 +295,13 @@ async function processAndSave(raw, tabId) {
       visual_description: aiResult.visual_description || null,
       embedding: aiResult.embedding || null
     });
+    const newItemId = inserted?.[0]?.id;
+    if (newItemId && projectId) {
+      await sbInsert("item_projects", {
+        item_id: newItemId,
+        project_id: projectId,
+      });
+    }
 
     if (tabId) {
       const projRows = projectId
