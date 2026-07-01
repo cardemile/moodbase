@@ -111,7 +111,8 @@ function looksLikeImage(url) {
     url.includes("images.") ||
     url.includes("/image/") ||
     url.includes("cdn.") ||
-    url.includes("static.");
+    url.includes("static.") ||
+    url.includes("pinimg.com");
 }
 
 async function claudeText(apiKey, prompt, maxTokens = 400) {
