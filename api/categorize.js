@@ -136,6 +136,21 @@ async function claudeText(apiKey, prompt, maxTokens = 400) {
 }
 
 async function claudeVision(apiKey, prompt, imageUrl) {
+  let imageSource;
+  try {
+    const imgResp = await fetch(imageUrl, {
+      headers: { "User-Agent": "Mozilla/5.0 (compatible; Moodbase/1.0)" }
+    });
+    if (!imgResp.ok) throw new Error("Image fetch failed: " + imgResp.status);
+    const arrayBuffer = await imgResp.arrayBuffer();
+    const base64 = Buffer.from(arrayBuffer).toString("base64");
+    const contentType = imgResp.headers.get("content-type") || "image/jpeg";
+    const mediaType = contentType.split(";")[0].trim();
+    imageSource = { type: "base64", media_type: mediaType, data: base64 };
+  } catch (fetchErr) {
+    console.warn("[vision] fetch failed, trying URL mode:", fetchErr.message);
+    imageSource = { type: "url", url: imageUrl };
+  }
   const resp = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: {
@@ -146,21 +161,15 @@ async function claudeVision(apiKey, prompt, imageUrl) {
     body: JSON.stringify({
       model: "claude-sonnet-4-5",
       max_tokens: 400,
-      messages: [
-        {
-          role: "user",
-          content: [
-            {
-              type: "image",
-              source: { type: "url", url: imageUrl },
-            },
-            { type: "text", text: prompt },
-          ],
-        },
-      ],
+      messages: [{
+        role: "user",
+        content: [
+          { type: "image", source: imageSource },
+          { type: "text", text: prompt },
+        ],
+      }],
     }),
   });
-
   const data = await resp.json();
   if (!resp.ok) throw new Error(data.error?.message || "Claude Vision error");
   return data.content[0].text;
